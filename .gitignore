@@ -1,0 +1,8 @@
+*.pyc
+erpnext-developer-forum.csv
+erpnext-user-forum.csv
+mails/
+messages.json
+threads/
+topics/
+users.json
