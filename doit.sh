@@ -2,3 +2,4 @@
 mkdir -p mails threads topics
 python fetch_via_imap.py
 python fetch_thread_ids.py
+python get_message_topics.py

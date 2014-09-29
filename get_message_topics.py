@@ -21,6 +21,9 @@ def invert_dict(ddict):
 def get_mails():
 	return os.listdir(maildir)
 
+def get_topics():
+	return os.listdir(topicdir)
+
 def get_tids():
 	global tids
 	if tids:
@@ -65,7 +68,8 @@ def get_thread_topic(tid):
 
 def mails_to_topics():
 	ret = {}
-	for mail in get_mails():
+	to_process = set(get_mails()) - set(get_topics())
+	for mail in to_process:
 		tid = get_tids()[mail]
 		ret[mail] = get_thread_topic(tid)
 	return ret
