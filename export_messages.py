@@ -3,6 +3,7 @@ import hashlib
 import dateutil.parser
 import os
 import json
+import re
 from email.utils import parseaddr
 
 tiddir = 'threads'
@@ -23,17 +24,20 @@ def get_message_body(mail):
 		elif part.get_content_type() == "text/html":
 			html.append(part)
 	if html:
-		return html[0].get_payload(decode=True).decode("ISO-8859-1")
+		return html[0].get_payload(decode=True).decode(html[0].get_content_charset())
 	elif text:
-		return text[0].get_payload(decode=True).decode("ISO-8859-1")
+		return text[0].get_payload(decode=True).decode(text[0].get_content_charset())
 	else:
 		raise Exception('No suitable part found')
+
+def mask_emails(body):
+	return re.sub(r"([\w\.-]{2})[\w\.-]+@([\w\.-]+)", r"\1...@\2", body)
 
 def get_messages():
 	tid_to_mail = get_tid_to_mail_dict()
 	tids = tid_to_mail.keys()
 	ret = []
-	for tid in tids[:10]:
+	for tid in tids:
 		thread = []
 		mails = tid_to_mail[tid]
 		topic = get_topic(mails[0])
@@ -43,8 +47,7 @@ def get_messages():
 				'post_id': mail,
 				'topic': topic,
 				'user_id': hashlib.md5(parseaddr(get_mail_message(mail)['From'])[1]).hexdigest(),
-				'category': 15,
-				'message': get_message_body(mail),
+				'message': mask_emails(get_message_body(mail)),
 				'created_at': get_mail_message(mail)['Date']
 			})
 		thread.sort(key=lambda msg: dateutil.parser.parse(msg['created_at']))
